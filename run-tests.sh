@@ -44,7 +44,7 @@ hwaf configure \
     bdist \
     || exit 1
 tar ztvf proj-b-x86_64-${HWAF_OS}-gcc-opt-0.0.1.tar.gz || exit 1
-
+hwaf run app-pkg-ba || exit 1
 popd || exit 1
 
 echo "::: building proj-c..."
@@ -62,6 +62,7 @@ hwaf configure \
     bdist \
     || exit 1
 tar ztvf proj-c-x86_64-${HWAF_OS}-gcc-opt-0.0.1.tar.gz || exit 1
+hwaf run app-pkg-ca || exit 1
 
 popd || exit 1
 
