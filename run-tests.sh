@@ -19,6 +19,7 @@ done
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-a \
+    --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --destdir=${DESTDIR} \
     --out=${OUTDIR} \
     build \
@@ -26,7 +27,7 @@ hwaf configure \
     bdist \
     || exit 1
 tar ztvf proj-a-x86_64-${HWAF_OS}-gcc-opt-0.0.1.tar.gz || exit 1
-
+hwaf run python -c 'import pkgaa' || exit 1
 popd || exit 1
 
 echo "::: building proj-b..."
@@ -37,6 +38,7 @@ hwaf co git@github.com:mana-fwk/hwaf-tests-pkg-ba pkg-ba || exit 1
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-b \
+    --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --destdir=${DESTDIR} \
     --out=${OUTDIR} \
     build \
@@ -45,6 +47,8 @@ hwaf configure \
     || exit 1
 tar ztvf proj-b-x86_64-${HWAF_OS}-gcc-opt-0.0.1.tar.gz || exit 1
 hwaf run app-pkg-ba || exit 1
+hwaf run python -c 'import sys; sys.stdout.write("%s\n"%sys.path)' || exit 1
+hwaf run python -c 'import pkgba' || exit 1
 popd || exit 1
 
 echo "::: building proj-c..."
@@ -55,6 +59,7 @@ hwaf co git@github.com:mana-fwk/hwaf-tests-pkg-ca pkg-ca || exit 1
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-c \
+    --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --destdir=${DESTDIR} \
     --out=${OUTDIR} \
     build \
@@ -63,7 +68,7 @@ hwaf configure \
     || exit 1
 tar ztvf proj-c-x86_64-${HWAF_OS}-gcc-opt-0.0.1.tar.gz || exit 1
 hwaf run app-pkg-ca || exit 1
-
+hwaf run python -c 'import pkgca' || exit 1
 popd || exit 1
 
 echo "::: running hwaf-tests-mprojs... [done]"
