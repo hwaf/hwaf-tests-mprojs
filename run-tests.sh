@@ -5,6 +5,8 @@ mkdir mprojs || exit 1
 pushd mprojs || exit 1
 
 TOPDIR=`pwd`
+HWAF_PKGROOT=git@github.com:mana-fwk
+#HWAF_PKGROOT=`pwd`/..
 DESTDIR=`pwd`/install-area
 OUTDIR=`pwd`/__build__
 #OUTDIR=__build__
@@ -22,7 +24,7 @@ echo "::: building ext-proj..."
 hwaf init proj-ext || exit 1
 pushd proj-ext || exit 1
 hwaf setup || exit 1
-hwaf co git@github.com:mana-fwk/hwaf-tests-pkg-ext ext-root || exit 1
+hwaf co ${HWAF_PKGROOT}/hwaf-tests-pkg-ext ext-root || exit 1
 
 ## simulate an external-area installation for ROOT
 mkdir -p ${DESTDIR}/opt/sw/hwaf-tests-mprojs/external/root/bin || exit 1
@@ -63,7 +65,7 @@ hwaf setup \
     || exit 1
 #hwaf setup || exit 1
 for pkg in pkg-settings pkg-aa pkg-ab pkg-ac; do
-    hwaf co git@github.com:mana-fwk/hwaf-tests-$pkg $pkg || exit 1
+    hwaf co $HWAF_PKGROOT/hwaf-tests-$pkg $pkg || exit 1
 done
 
 hwaf configure \
@@ -89,7 +91,7 @@ echo "::: building proj-b..."
 hwaf init proj-b || exit 1
 pushd proj-b || exit 1
 hwaf setup -p=${DESTDIR}/opt/sw/hwaf-tests-mprojs/proj-a/${HWAF_VERS} || exit 1
-hwaf co git@github.com:mana-fwk/hwaf-tests-pkg-ba pkg-ba || exit 1
+hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ba pkg-ba || exit 1
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-b/${HWAF_VERS} \
@@ -118,7 +120,7 @@ pushd proj-c || exit 1
 hwaf setup \
     -p=${DESTDIR}/opt/sw/hwaf-tests-mprojs/proj-b/${HWAF_VERS} \
     || exit 1
-hwaf co git@github.com:mana-fwk/hwaf-tests-pkg-ca pkg-ca || exit 1
+hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ca pkg-ca || exit 1
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-c/${HWAF_VERS} \
@@ -146,12 +148,17 @@ mkdir local-install || exit 1
 for pkg in `ls -1 proj-?/proj-?-*-${HWAF_VERS}.tar.gz`; do
     tar -C ./local-install -zxf $pkg || exit 1
 done
+/bin/rm -rf old-projs
+/bin/mkdir old-projs
+/bin/mv proj-? old-projs/. || exit 1
 
 hwaf init usr-test || exit 1
 pushd usr-test || exit 1
 hwaf setup \
     -p ../local-install/opt/sw/hwaf-tests-mprojs/proj-c/${HWAF_VERS} \
     || exit 1
+
+hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ab pkg-ab || exit 1
 hwaf configure build install \
     --project-version=${HWAF_VERS} \
     || exit 1
