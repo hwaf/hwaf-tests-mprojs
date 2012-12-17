@@ -12,6 +12,8 @@ OUTDIR=`pwd`/__build__
 #OUTDIR=__build__
 HWAF_OS=`uname | tr 'A-Z' 'a-z'`
 HWAF_VERS=`date +%Y%m%d`
+HWAF_CXX=${CXX-gcc}
+export CMTCFG=${CMTCFG-x86_64-${HWAF_OS}-${HWAF_CXX}-opt}
 echo "::: running hwaf-tests-mprojs..."
 
 /bin/rm -rf \
@@ -42,13 +44,14 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
+    --cmtcfg=$CMTCFG \
     --out=${OUTDIR}/proj-ext \
     --with-root=${ROOTSYS} \
     build \
     install \
     bdist \
     || exit 1
-tar ztvf proj-ext-x86_64-${HWAF_OS}-gcc-opt-${HWAF_VERS}.tar.gz || exit 1
+tar ztvf proj-ext-${CMTCFG}-${HWAF_VERS}.tar.gz || exit 1
 hwaf run python -c 'import sys; sys.stdout.write("%s\n"%sys.path)' || exit 1
 hwaf run python \
     -c 'import ROOT, sys; sys.stdout.write("%s\n" % ROOT.__file__)' \
@@ -73,12 +76,13 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
+    --cmtcfg=$CMTCFG \
     --out=${OUTDIR}/proj-a \
     build \
     install \
     bdist \
     || exit 1
-tar ztvf proj-a-x86_64-${HWAF_OS}-gcc-opt-${HWAF_VERS}.tar.gz || exit 1
+tar ztvf proj-a-${CMTCFG}-${HWAF_VERS}.tar.gz || exit 1
 hwaf run python -c 'import pkgaa' || exit 1
 hwaf run python \
     -c 'import sys, os; sys.stdout.write("%s\n" % os.environ["JOBOPTPATH"])' \
@@ -98,12 +102,13 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
+    --cmtcfg=$CMTCFG \
     --out=${OUTDIR}/proj-b \
     build \
     install \
     bdist \
     || exit 1
-tar ztvf proj-b-x86_64-${HWAF_OS}-gcc-opt-${HWAF_VERS}.tar.gz || exit 1
+tar ztvf proj-b-${CMTCFG}-${HWAF_VERS}.tar.gz || exit 1
 hwaf run app-pkg-ba || exit 1
 hwaf run python -c 'import sys; sys.stdout.write("%s\n"%sys.path)' || exit 1
 hwaf run python -c 'import pkgba' || exit 1
@@ -127,12 +132,13 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
+    --cmtcfg=$CMTCFG \
     --out=${OUTDIR}/proj-c \
     build \
     install \
     bdist \
     || exit 1
-tar ztvf proj-c-x86_64-${HWAF_OS}-gcc-opt-${HWAF_VERS}.tar.gz || exit 1
+tar ztvf proj-c-${CMTCFG}-${HWAF_VERS}.tar.gz || exit 1
 hwaf run app-pkg-ca || exit 1
 hwaf run python -c 'import pkgca' || exit 1
 hwaf run python \
@@ -161,6 +167,7 @@ hwaf setup \
 hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ab pkg-ab || exit 1
 hwaf configure build install \
     --project-version=${HWAF_VERS} \
+    --cmtcfg=$CMTCFG \
     || exit 1
 hwaf run python -c 'import pkgaa' || exit 1
 hwaf run python -c 'import pkgba' || exit 1
