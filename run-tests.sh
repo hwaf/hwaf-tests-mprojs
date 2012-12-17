@@ -1,5 +1,10 @@
 #!/bin/bash
 
+/bin/rm -rf mprojs
+mkdir mprojs || exit 1
+pushd mprojs || exit 1
+
+TOPDIR=`pwd`
 DESTDIR=`pwd`/install-area
 OUTDIR=`pwd`/__build__
 #OUTDIR=__build__
@@ -13,10 +18,50 @@ echo "::: running hwaf-tests-mprojs..."
 
 echo ""
 echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
+echo "::: building ext-proj..."
+hwaf init proj-ext || exit 1
+pushd proj-ext || exit 1
+hwaf setup || exit 1
+hwaf co git@github.com:mana-fwk/hwaf-tests-pkg-ext ext-root || exit 1
+
+## simulate an external-area installation for ROOT
+mkdir -p ${DESTDIR}/opt/sw/hwaf-tests-mprojs/external/root/bin || exit 1
+ROOTSYS=${DESTDIR}/opt/sw/hwaf-tests-mprojs/external/root
+PYTHONPATH=${ROOTSYS}/lib
+ln -s /usr/lib/root ${ROOTSYS}/lib || exit 1
+ln -s /usr/include/root ${ROOTSYS}/include || exit 1
+for bin in root-config root root.exe rootcint genmap genreflex; do
+    ln -s /usr/bin/$bin ${ROOTSYS}/bin/. || exit 1
+done
+##
+
+hwaf configure \
+    --prefix=/opt/sw/hwaf-tests-mprojs/proj-ext/${HWAF_VERS} \
+    --relocate-from=/opt/sw/hwaf-tests-mprojs \
+    --project-version=${HWAF_VERS} \
+    --destdir=${DESTDIR} \
+    --out=${OUTDIR}/proj-ext \
+    --with-root=${ROOTSYS} \
+    build \
+    install \
+    bdist \
+    || exit 1
+tar ztvf proj-ext-x86_64-${HWAF_OS}-gcc-opt-${HWAF_VERS}.tar.gz || exit 1
+hwaf run python -c 'import sys; sys.stdout.write("%s\n"%sys.path)' || exit 1
+hwaf run python \
+    -c 'import ROOT, sys; sys.stdout.write("%s\n" % ROOT.__file__)' \
+    || exit 1
+popd || exit 1
+
+echo ""
+echo "::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::"
 echo "::: building proj-a..."
 hwaf init proj-a || exit 1
 pushd proj-a || exit 1
-hwaf setup || exit 1
+hwaf setup \
+    -p=${DESTDIR}/opt/sw/hwaf-tests-mprojs/proj-ext/${HWAF_VERS} \
+    || exit 1
+#hwaf setup || exit 1
 for pkg in pkg-settings pkg-aa pkg-ab pkg-ac; do
     hwaf co git@github.com:mana-fwk/hwaf-tests-$pkg $pkg || exit 1
 done
@@ -26,7 +71,7 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
-    --out=${OUTDIR} \
+    --out=${OUTDIR}/proj-a \
     build \
     install \
     bdist \
@@ -51,7 +96,7 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
-    --out=${OUTDIR} \
+    --out=${OUTDIR}/proj-b \
     build \
     install \
     bdist \
@@ -80,7 +125,7 @@ hwaf configure \
     --relocate-from=/opt/sw/hwaf-tests-mprojs \
     --project-version=${HWAF_VERS} \
     --destdir=${DESTDIR} \
-    --out=${OUTDIR} \
+    --out=${OUTDIR}/proj-c \
     build \
     install \
     bdist \
