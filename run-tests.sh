@@ -26,7 +26,7 @@ echo "::: building ext-proj..."
 hwaf init proj-ext || exit 1
 pushd proj-ext || exit 1
 hwaf setup || exit 1
-hwaf co ${HWAF_PKGROOT}/hwaf-tests-pkg-ext ext-root || exit 1
+hwaf pkg co ${HWAF_PKGROOT}/hwaf-tests-pkg-ext ext-root || exit 1
 
 ## simulate an external-area installation for ROOT
 mkdir -p ${DESTDIR}/opt/sw/hwaf-tests-mprojs/external/root/bin || exit 1
@@ -68,7 +68,7 @@ hwaf setup \
     || exit 1
 #hwaf setup || exit 1
 for pkg in pkg-settings pkg-aa pkg-ab pkg-ac; do
-    hwaf co $HWAF_PKGROOT/hwaf-tests-$pkg $pkg || exit 1
+    hwaf pkg co $HWAF_PKGROOT/hwaf-tests-$pkg $pkg || exit 1
 done
 
 hwaf configure \
@@ -95,7 +95,7 @@ echo "::: building proj-b..."
 hwaf init proj-b || exit 1
 pushd proj-b || exit 1
 hwaf setup -p=${DESTDIR}/opt/sw/hwaf-tests-mprojs/proj-a/${HWAF_VERS} || exit 1
-hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ba pkg-ba || exit 1
+hwaf pkg co $HWAF_PKGROOT/hwaf-tests-pkg-ba pkg-ba || exit 1
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-b/${HWAF_VERS} \
@@ -125,7 +125,7 @@ pushd proj-c || exit 1
 hwaf setup \
     -p=${DESTDIR}/opt/sw/hwaf-tests-mprojs/proj-b/${HWAF_VERS} \
     || exit 1
-hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ca pkg-ca || exit 1
+hwaf pkg co $HWAF_PKGROOT/hwaf-tests-pkg-ca pkg-ca || exit 1
 
 hwaf configure \
     --prefix=/opt/sw/hwaf-tests-mprojs/proj-c/${HWAF_VERS} \
@@ -164,7 +164,7 @@ hwaf setup \
     -p ../local-install/opt/sw/hwaf-tests-mprojs/proj-c/${HWAF_VERS} \
     || exit 1
 
-hwaf co $HWAF_PKGROOT/hwaf-tests-pkg-ab pkg-ab || exit 1
+hwaf pkg co $HWAF_PKGROOT/hwaf-tests-pkg-ab pkg-ab || exit 1
 hwaf configure build install \
     --project-version=${HWAF_VERS} \
     --cmtcfg=$CMTCFG \
